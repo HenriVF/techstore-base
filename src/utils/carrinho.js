@@ -2,7 +2,8 @@
 // Ex.: duas camisetas iguais = o mesmo produto duas vezes no array.
 
 export function calcularTotal(carrinho) {
-  return carrinho.reduce((total, produto) => total + produto.price, 0)
+  const total = carrinho.reduce((soma, produto) => soma + produto.price, 0)
+  return Math.round(total * 100) / 100
 }
 
 export function agruparItens(carrinho) {

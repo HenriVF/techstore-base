@@ -1,8 +1,13 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router'
+import ProdutoCard from '../components/ProdutoCard'
+import { formatarPreco } from '../utils/formatarPreco'
 
-export default function PaginaProduto({ produtos, onAdicionar }) {
+export default function PaginaProduto({ produtos, onAdicionar, listaEspera, onRegistrarListaEspera }) {
   const { id } = useParams()
   const produto = produtos.find((item) => item.id === id)
+  const [formulario, setFormulario] = useState({ nome: '', email: '' })
+  const [mensagemEspera, setMensagemEspera] = useState('')
 
   if (!produto) {
     return (
@@ -15,9 +20,38 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
     )
   }
 
-  const relacionados = produtos
-    .filter((item) => item.category === produto.category && item.id !== produto.id)
+  const esgotado = produto.estoque === 0
+  const valorProduto = Number(produto.price || 0)
+  const valorRestanteFrete = Math.max(0, 200 - valorProduto)
+  const temFreteGratis = valorProduto >= 200
+  const relacionadas = produtos
+    .filter(
+      (item) =>
+        item.category === produto.category &&
+        item.id !== produto.id &&
+        Number(item.estoque) > 0
+    )
     .slice(0, 4)
+  const quantidadeEspera = listaEspera.filter((item) => item.produtoId === produto.id).length
+
+  function handleSubmit(event) {
+    event.preventDefault()
+
+    if (!formulario.nome.trim() || !formulario.email.trim()) {
+      setMensagemEspera('Preencha nome e e-mail para entrar na lista de espera.')
+      return
+    }
+
+    const cadastrado = onRegistrarListaEspera(produto.id, formulario.nome, formulario.email)
+
+    if (!cadastrado) {
+      setMensagemEspera('Você já está na lista de espera para este produto.')
+      return
+    }
+
+    setFormulario({ nome: '', email: '' })
+    setMensagemEspera('Você foi adicionado à lista de espera. Vamos avisar quando o produto voltar.')
+  }
 
   return (
     <section>
@@ -37,17 +71,71 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
           <p className="card-avaliacao">
             ★ {produto.rating.rate} <span>({produto.rating.count} avaliações)</span>
           </p>
-          <p className="detalhe-preco">R$ {produto.price.toFixed(2).replace('.', ',')}</p>
+          <p className="detalhe-preco">{formatarPreco(produto.price)}</p>
           <p className="detalhe-descricao">{produto.description}</p>
-          <p className="detalhe-estoque">{produto.estoque} unidades disponíveis</p>
+
+          <p className={temFreteGratis ? 'mensagem-frete mensagem-frete-gratis' : 'mensagem-frete'}>
+            {temFreteGratis
+              ? 'Frete grátis liberado para esta compra.'
+              : `Faltam ${formatarPreco(valorRestanteFrete)} para ganhar frete grátis.`}
+          </p>
+
+          {esgotado ? (
+            <p className="detalhe-estoque detalhe-estoque-esgotado">Produto esgotado</p>
+          ) : (
+            <p className="detalhe-estoque">{produto.estoque} unidades disponíveis</p>
+          )}
 
           <button
             className="botao botao-grande"
             onClick={() => onAdicionar(produto)}
-            disabled={produto.estoque === 0}
+            disabled={esgotado}
           >
-            Adicionar ao carrinho
+            {esgotado ? 'Esgotado' : 'Adicionar ao carrinho'}
           </button>
+
+          {esgotado && (
+            <div className="card-lista-espera">
+              <h2>Avise-me quando voltar</h2>
+              <p className="lista-espera-resumo">
+                {quantidadeEspera > 0
+                  ? `${quantidadeEspera} pessoa${quantidadeEspera > 1 ? 's' : ''} na lista de espera.`
+                  : 'Seja o primeiro a receber o aviso.'}
+              </p>
+
+              <form className="formulario-espera" onSubmit={handleSubmit}>
+                <label>
+                  Nome
+                  <input
+                    type="text"
+                    value={formulario.nome}
+                    onChange={(event) =>
+                      setFormulario((atual) => ({ ...atual, nome: event.target.value }))
+                    }
+                    placeholder="Seu nome"
+                  />
+                </label>
+
+                <label>
+                  E-mail
+                  <input
+                    type="email"
+                    value={formulario.email}
+                    onChange={(event) =>
+                      setFormulario((atual) => ({ ...atual, email: event.target.value }))
+                    }
+                    placeholder="seu@email.com"
+                  />
+                </label>
+
+                <button type="submit" className="botao botao-secundario botao-grande">
+                  Quero receber o aviso
+                </button>
+              </form>
+
+              {mensagemEspera && <p className="mensagem-espera">{mensagemEspera}</p>}
+            </div>
+          )}
 
           <ul className="detalhe-garantias">
             <li>Troca grátis em até 30 dias</li>
@@ -58,20 +146,13 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
 
       <h2>Produtos relacionados</h2>
       <div className="grade">
-        {relacionados.map((item) => (
-          <article key={item.id} className="card">
-            <Link to={`/produto/${item.id}`} className="card-link">
-              <div className="card-imagem-moldura">
-                <img src={item.image} alt={item.title} className="card-imagem" />
-              </div>
-              <h3 className="card-titulo">{item.title}</h3>
-            </Link>
-            <p className="preco">R$ {Number(item.price).toFixed(2).replace('.', ',')}</p>
-            <button className="botao" onClick={() => onAdicionar(item)}>
-              Adicionar ao carrinho
-            </button>
-          </article>
-        ))}
+        {relacionadas.length === 0 ? (
+          <p className="estado-vazio estado-vazio-amplo">
+            Não há produtos relacionados disponíveis no momento.
+          </p>
+        ) : (
+          relacionadas.map((item) => <ProdutoCard key={item.id} produto={item} onAdicionar={onAdicionar} />)
+        )}
       </div>
     </section>
   )

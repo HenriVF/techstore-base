@@ -3,15 +3,19 @@ const CUPONS = {
 }
 
 export function validarCupom(codigo, cliente) {
-  const codigoNormalizado = codigo.trim().toUpperCase()
+  const codigoNormalizado = (codigo ?? '').trim().toUpperCase()
   const desconto = CUPONS[codigoNormalizado]
 
   if (!desconto) {
     return { valido: false }
   }
 
-  if (codigoNormalizado === 'PRIMEIRACOMPRA' && cliente.pedidosAnteriores > 0) {
-    return { valido: false }
+  if (codigoNormalizado === 'PRIMEIRACOMPRA') {
+    const pedidosAnteriores = Number(cliente?.pedidosAnteriores ?? 0)
+
+    if (!cliente || pedidosAnteriores > 0) {
+      return { valido: false }
+    }
   }
 
   return { valido: true, desconto }

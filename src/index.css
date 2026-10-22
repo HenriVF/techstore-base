@@ -300,6 +300,23 @@ h2 {
   gap: var(--espaco-5) var(--espaco-4);
 }
 
+.bloco-esgotados {
+  margin-top: var(--espaco-7);
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.mensagem-esgotados {
+  margin: 0;
+  color: var(--cor-destaque);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.grade-esgotados {
+  opacity: 0.9;
+}
+
 @media (min-width: 768px) {
   .grade {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -432,6 +449,21 @@ h2 {
 .selo-ok {
   background: var(--cor-frete-fundo);
   color: var(--cor-frete);
+}
+
+.mensagem-frete {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--cor-alerta);
+}
+
+.mensagem-frete-gratis {
+  color: var(--cor-frete);
+}
+
+.sugestao-card {
+  height: 100%;
 }
 
 /* Botões */
@@ -569,6 +601,58 @@ h2 {
 .detalhe-estoque {
   margin: 0;
   font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--cor-frete);
+}
+
+.detalhe-estoque-esgotado {
+  color: var(--cor-erro);
+}
+
+.card-lista-espera {
+  display: grid;
+  gap: var(--espaco-4);
+  padding: var(--espaco-4);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+.card-lista-espera h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.lista-espera-resumo {
+  margin: 0;
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+}
+
+.formulario-espera {
+  display: grid;
+  gap: var(--espaco-3);
+}
+
+.formulario-espera label {
+  display: grid;
+  gap: var(--espaco-2);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cor-texto-suave);
+}
+
+.formulario-espera input {
+  width: 100%;
+  padding: var(--espaco-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--cor-fundo);
+}
+
+.mensagem-espera {
+  margin: 0;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--cor-frete);
 }
@@ -821,6 +905,141 @@ h2 {
 
 .tabela tbody tr:last-child td {
   border-bottom: none;
+}
+
+.area-espera {
+  margin-top: var(--espaco-7);
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.lista-espera-interna {
+  list-style: none;
+  display: grid;
+  gap: var(--espaco-4);
+  padding: 0;
+  margin: 0;
+}
+
+.item-espera {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--espaco-4);
+  display: grid;
+  gap: var(--espaco-3);
+}
+
+.item-espera-topo {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.clientes-espera {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--espaco-2);
+}
+
+.clientes-espera li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espaco-4);
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: var(--cor-texto-suave);
+}
+
+.estado-vazio-amplo {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+/* Painel do lojista */
+.painel-resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--espaco-4);
+  margin-bottom: var(--espaco-6);
+}
+
+.painel-card {
+  display: grid;
+  gap: var(--espaco-2);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--espaco-5);
+}
+
+.painel-rotulo {
+  color: var(--cor-texto-suave);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.painel-card strong {
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+}
+
+.painel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--espaco-5);
+}
+
+.painel-categoria {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  padding: var(--espaco-5);
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.painel-categoria-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-2);
+  flex-wrap: wrap;
+}
+
+.painel-categoria-topo h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.painel-metrica {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--espaco-3);
+}
+
+.painel-metrica li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  color: var(--cor-texto-suave);
+  padding-top: var(--espaco-2);
+  border-top: 1px solid var(--cor-borda);
+}
+
+.painel-metrica strong {
+  color: var(--cor-texto);
+}
+
+.painel-acao {
+  margin-top: var(--espaco-6);
 }
 
 /* Rodapé */

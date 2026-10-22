@@ -7,6 +7,7 @@ import Loja from './pages/Loja'
 import PaginaProduto from './pages/PaginaProduto'
 import Carrinho from './pages/Carrinho'
 import Estoque from './pages/Estoque'
+import PainelLojista from './pages/PainelLojista'
 import { buscarProdutos } from './services/produtos'
 import { buscarClientes } from './services/clientes'
 
@@ -17,6 +18,7 @@ export default function App() {
   const [carrinho, setCarrinho] = useState([])
   const [clientes, setClientes] = useState([])
   const [clienteAtualId, setClienteAtualId] = useState(null)
+  const [listaEspera, setListaEspera] = useState([])
 
   useEffect(() => {
     buscarProdutos()
@@ -26,7 +28,13 @@ export default function App() {
 
     buscarClientes().then((dados) => {
       setClientes(dados)
-      if (dados.length > 0) setClienteAtualId(dados[0].id)
+
+      if (dados.length > 0) {
+        const clientePrimeiraCompra =
+          dados.find((cliente) => Number(cliente.pedidosAnteriores) === 0) ?? dados[0]
+
+        setClienteAtualId(clientePrimeiraCompra?.id ?? null)
+      }
     })
   }, [])
 
@@ -48,6 +56,37 @@ export default function App() {
     )
   }
 
+  function registrarListaEspera(produtoId, nome, email) {
+    const nomeLimpo = nome.trim()
+    const emailLimpo = email.trim().toLowerCase()
+    const produto = produtos.find((item) => item.id === produtoId)
+
+    if (!produto || !nomeLimpo || !emailLimpo) {
+      return false
+    }
+
+    const jaCadastrado = listaEspera.some(
+      (item) => item.produtoId === produtoId && item.email.toLowerCase() === emailLimpo
+    )
+
+    if (jaCadastrado) {
+      return false
+    }
+
+    setListaEspera((atual) => [
+      ...atual,
+      {
+        id: crypto.randomUUID(),
+        produtoId,
+        produtoTitulo: produto.title,
+        nome: nomeLimpo,
+        email: emailLimpo,
+      },
+    ])
+
+    return true
+  }
+
   const clienteAtual = clientes.find((cliente) => cliente.id === clienteAtualId)
 
   return (
@@ -67,7 +106,14 @@ export default function App() {
             />
             <Route
               path="/produto/:id"
-              element={<PaginaProduto produtos={produtos} onAdicionar={adicionarAoCarrinho} />}
+              element={
+                <PaginaProduto
+                  produtos={produtos}
+                  onAdicionar={adicionarAoCarrinho}
+                  listaEspera={listaEspera}
+                  onRegistrarListaEspera={registrarListaEspera}
+                />
+              }
             />
             <Route
               path="/carrinho"
@@ -81,7 +127,14 @@ export default function App() {
                 />
               }
             />
-            <Route path="/estoque" element={<Estoque produtos={produtos} />} />
+            <Route
+              path="/estoque"
+              element={<Estoque produtos={produtos} listaEspera={listaEspera} />}
+            />
+            <Route
+              path="/painel"
+              element={<PainelLojista produtos={produtos} listaEspera={listaEspera} />}
+            />
           </Routes>
         )}
       </main>

@@ -13,6 +13,8 @@ export default function Carrinho({ carrinho, produtos, clienteAtual, onAdicionar
   const itens = agruparItens(carrinho)
   const total = calcularTotal(carrinho)
   const totalComDesconto = cupomAplicado ? total * (1 - cupomAplicado.desconto) : total
+  const valorRestanteFrete = Math.max(0, 200 - totalComDesconto)
+  const temFreteGratis = totalComDesconto >= 200
 
   const sugestoes = produtos
     .filter((produto) => !carrinho.find((item) => item.id === produto.id))
@@ -27,7 +29,11 @@ export default function Carrinho({ carrinho, produtos, clienteAtual, onAdicionar
       setMensagemCupom('Cupom aplicado!')
     } else {
       setCupomAplicado(null)
-      setMensagemCupom('Cupom inválido')
+      setMensagemCupom(
+        codigoCupom.trim().toUpperCase() === 'PRIMEIRACOMPRA'
+          ? 'Cupom exclusivo para primeira compra.'
+          : 'Cupom inválido'
+      )
     }
   }
 
@@ -93,6 +99,13 @@ export default function Carrinho({ carrinho, produtos, clienteAtual, onAdicionar
               <span>{cupomAplicado.desconto * 100}%</span>
             </p>
           )}
+
+          <p className={temFreteGratis ? 'mensagem-frete mensagem-frete-gratis' : 'mensagem-frete'}>
+            {temFreteGratis
+              ? 'Frete grátis liberado para esta compra.'
+              : `Faltam ${formatarPreco(valorRestanteFrete)} para ganhar frete grátis.`}
+          </p>
+
           <p className="total">
             <span>Total</span>
             <span>{formatarPreco(totalComDesconto)}</span>
